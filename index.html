@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>菜谱</title>
+		<link rel="stylesheet" type="text/css" href="fontion/iconfont.css"/>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			#box{
+				margin: 100px auto;
+				text-align: center;
+				width: 540px;
+				height: 36px;
+			}
+			#box input{
+				height: 32px;
+				width: 450px;
+				border: 2px solid pink;
+				outline-style: none;
+				text-indent: 1em;
+				font-size: 14px;
+			}
+			#box button{
+				border: none;
+				background-color: pink;
+				width: 86px;
+				height: 36px;
+				vertical-align: bottom;
+			}
+			.content{
+				text-align: center;
+			}
+			p{
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="box">
+			<input type="text" name="menu" id="menu" placeholder="请输入菜名" /><button id="search">
+				<i class="iconfont icon-sousuo5"  style="font-size: 20px;"></i>
+			</button>
+		</div>
+		<div class="content">
+			
+		</div>
+	</body>
+	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript">
+		$("#search").click(function(){
+			var menuName=$("#menu").val();
+			if (menuName=="" || menuName==null) {
+				alert("菜品不能为空");
+				return;
+			}
+			var myUrl="http://apis.juhe.cn/cook/query";
+			$.ajax({
+				type:"post",
+				url:myUrl,
+				async:true,
+				dataType:"jsonp",
+				crossDomain:true,
+				data:{
+					"key":"9ed6aa0e29003746373ad7b7b1c29465",
+					"menu":menuName,
+					"pn":1,
+					"rn":10
+				},
+				success:function(data){
+					//成功之后
+					console.log(data);
+					fromDate(data);
+				},
+				error:function(err){
+					//失败
+				}
+			});
+			
+			function fromDate(data){
+				if (data.resultcode==200) {
+					//访问成功
+					var result=data.result;
+					var dataArray=result.data;
+					$.each(dataArray,function(index){
+						var title=dataArray[index].title;
+						$(".content").append($("<p></p>").text("菜名："+title));
+						var tags=dataArray[index].tags;
+						$(".content").append($("<p></p>").text("类型："+tags));
+						var imtro=dataArray[index].imtro;
+						$(".content").append($("<p></p>").text("简介："+imtro));
+						var ingredients=dataArray[index].ingredients;
+						$(".content").append($("<p></p>").text("材料："+ingredients));
+						var burden=dataArray[index].burden;
+						$(".content").append($("<p></p>").text("辅料："+burden));
+						var albums=dataArray[index].albums;
+						$(".content").append($("<img/>").attr("src",albums[0]));
+						var steps=dataArray[index].steps;
+						for (var i=0;i<steps.length;i++) {
+							var step=steps[i].step;
+							$(".content").append($("<p></p>").text("步骤："+step));
+							var img=steps[i].img;
+							$(".content").append($("<img/>").attr("src",img));
+						}
+						$(".content").append($("<p></p>").text("*****************************************"));
+						$(".content").append($("<p></p>").text("*****************************************"));
+						$(".content").append($("<p></p>").text("*****************************************"));
+						$(".content").append($("<p></p>").text("*****************************************"));
+						$(".content").append($("<p></p>").text("*****************************************"));
+						
+						
+					})
+					
+				}else{
+					alert("并未收藏此菜！");
+				}
+			}
+			
+		})
+	</script>
+</html>
